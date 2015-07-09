@@ -6,32 +6,25 @@ using System.Threading.Tasks;
 
 namespace ControlLogic
 {
-    public class ObserverBase : IObservable<double>, IObserver<double>
+    public class ObserverBase 
     {
-        protected List<IObserver<double>> _clients = new List<IObserver<double>>();
-        public void OnCompleted()
-        {
-            foreach (var c in _clients)
-                c.OnCompleted();
-        }
-
-        public virtual void OnError(Exception error)
-        {
-            foreach (var c in _clients)
-                c.OnError(error);
+        protected List<ObserverBase> _clients = new List<ObserverBase>();
         
-        }
-
         public virtual void OnNext(double value)
         {
             foreach (var c in _clients)
                 c.OnNext(value);
         }
-        public virtual IDisposable Subscribe(IObserver<double> observer)
+        public virtual void AddObserver(ObserverBase observer)
         {
             _clients.Add(observer);
-            return new MyObserverCleanup(() => _clients.Remove(observer));
         }
+        public virtual ObserverBase Chain(ObserverBase observer)
+        {
+            _clients.Add(observer);
+            return observer;
+        }
+        
         private class MyObserverCleanup : IDisposable
         { 
             public MyObserverCleanup(Action doit)

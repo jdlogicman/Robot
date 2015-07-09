@@ -19,17 +19,16 @@ namespace Simulation
 
             
 
-        public static double CalculateNewVelocity(double velocityNow, int deltaTInSeconds = 1, 
+        public static double CalculateNewVelocity(double velocityNow, uint deltaTInMilliSeconds = 1000, 
             double mass = DEFAULT_MASS_KG, double volume = VOLUME_M3, 
             double areaFacingDirectionOfTravel = AREA_END_M2)
         {
-            const int ITERATIONS_PER_SECOND = 100;
-            const double DELTA_T_PER_ITERATION = 1 / (double)ITERATIONS_PER_SECOND;
+            const double DELTA_T_PER_ITERATION = 0.001; ;
             
             double massOfDisplacedWater = volume * FLUID_DENSITY_KG_PER_M3;
             double gravityForce = (mass - massOfDisplacedWater) * GRAVITY;
 
-            for (int i = 0; i < deltaTInSeconds * ITERATIONS_PER_SECOND; i++)
+            for (int i = 0; i < deltaTInMilliSeconds; i++)
             {
                 double dragForce = CalculateDragForce(velocityNow, areaFacingDirectionOfTravel);
                 double totalForce = gravityForce + dragForce;

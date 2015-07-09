@@ -17,7 +17,7 @@ namespace ControlLogic
         { 
             _values[_position++ % _values.Length] = value;
             if (_position >= _values.Length)
-                base.OnNext(_values.Sum() / _values.Length);
+                base.OnNext(_values.Average());
         }
         double[] _values;
         uint _position;

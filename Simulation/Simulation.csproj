@@ -40,6 +40,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LambdaObserver.cs" />
+    <Compile Include="LogObserver.cs" />
+    <Compile Include="PressureSimulation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VelocitySimulation.cs" />
   </ItemGroup>

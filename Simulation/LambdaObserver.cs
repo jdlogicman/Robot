@@ -22,6 +22,6 @@ namespace Simulation
         }
 
         private Func<double, double> _processor;
-        
+
     }
 }
