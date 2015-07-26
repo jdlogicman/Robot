@@ -6,21 +6,25 @@ using System.Threading.Tasks;
 
 namespace ControlLogic
 {
-    public class ButtonPressCounter
+    public class ButtonPressCounter 
     {
         TimeSpan _debounceInterval;
         TimeSpan _buttonPressGroupFinalization;
         DateTime _lastPress;
+        INotificationHandle _notifyHandle;
         bool _debouncing;
         uint _count;
 
         public event Action<uint> OnButtonStreamComplete;
 
-        public ButtonPressCounter(TimeSpan debounceInterval, TimeSpan buttonPressGroupFinalization)
+        public ButtonPressCounter(IClock clock, TimeSpan debounceInterval, TimeSpan buttonPressGroupFinalization)
         {
+            if (buttonPressGroupFinalization.TotalMilliseconds <= 2*debounceInterval.TotalMilliseconds)
+                throw new ArgumentOutOfRangeException("debounceInterval", "Group finalization interval must be GT 2*debounce interval");
             _debounceInterval = debounceInterval;
             _buttonPressGroupFinalization = buttonPressGroupFinalization;
             _lastPress = DateTime.MinValue;
+            _notifyHandle = clock.Register(buttonPressGroupFinalization, (nc) => Tick());
         }
         public void RecordPress()
         {
@@ -32,7 +36,7 @@ namespace ControlLogic
             } 
             
         }
-        public void Tick()
+        void Tick()
         {
             FinishDebounce();
             if (_count > 0 && !_debouncing && (DateTime.Now - _lastPress) > _buttonPressGroupFinalization)

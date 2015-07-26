@@ -10,9 +10,30 @@ namespace ControlLogicTest
 {
     class MockClock : IClock
     {
+        List<MockNotificationHandle> _timers = new List<MockNotificationHandle>();
         public INotificationHandle Register(TimeSpan interval, Action<INotificationHandle> callback)
         {
-            return new MockNotificationHandle(interval, callback);
+            var newTimer = new MockNotificationHandle(interval, callback);
+            _timers.Add(newTimer);
+            return newTimer;
+        }
+
+
+        public void Start()
+        {
+            foreach (var t in _timers)
+            {
+                t.Start();
+            }
+        }
+
+        public void Stop()
+        {
+            foreach (var t in _timers)
+            {
+                t.Cancel();
+            }
+            _timers.Clear();
         }
     }
 
@@ -23,18 +44,25 @@ namespace ControlLogicTest
         public MockNotificationHandle(TimeSpan interval, Action<INotificationHandle> callback)
         {
             _task = new Task(() =>
-            { 
+            {
                 while (!_sync.Wait(interval))
                 {
                     callback(this);
                 }
-            });
+            }, TaskCreationOptions.LongRunning);
+        }
+
+        public void Start()
+        {
             _task.Start();
         }
         public void Cancel()
         {
-            _sync.Set();
-            _task.Wait();
+            if (!_sync.IsSet)
+            {
+                _sync.Set();
+                _task.Wait();
+            }
         }
     }
 

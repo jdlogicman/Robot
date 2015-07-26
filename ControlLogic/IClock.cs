@@ -14,5 +14,7 @@ namespace ControlLogic
     public interface IClock
     {
         INotificationHandle Register(TimeSpan interval, Action<INotificationHandle> callback);
+        void Start();
+        void Stop();
     }
 }
