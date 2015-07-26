@@ -39,7 +39,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ButtonPressCounter.cs" />
     <Compile Include="Clamper.cs" />
+    <Compile Include="IClock.cs" />
     <Compile Include="ObserverBase.cs" />
     <Compile Include="Smoother.cs" />
     <Compile Include="Pid.cs" />

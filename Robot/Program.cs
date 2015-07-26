@@ -17,7 +17,7 @@ namespace Robot
             
             const double TARGET_PRESSURE = 2; // bar, relative to surface
             const double MAX_ABS_VELOCITY = 2; // m/s
-            const uint DELTA_T_MS = 10;
+            const uint DELTA_T_MS = 1000;
             const uint CYCLES_PER_SECOND = 1000 / DELTA_T_MS;
             double pressureNow = 0;
             double velocityNow = 0;
@@ -48,7 +48,7 @@ namespace Robot
                     return velocityNow - v;
                 });
 
-            var velocityController = new Pid(-5, 0, 0);
+            var velocityController = new Pid(-0.5, 0,0);
 
 
             velocitySimulator.Chain(new LambdaObserver(v => velocityNow = v))
@@ -71,7 +71,7 @@ namespace Robot
             int cycles = 0;
             int stableCycles = 0;
             
-            while (cycles++ < 1000000 && stableCycles < 20 )
+            while (cycles++ < 1000000 && stableCycles < 5 )
             {
                 LogObserver.Values["ballastMass"] = bs.WaterMass;
                 //LogObserver.Values["displacedMass"] = VelocitySimulation.MASS_OF_DISPLACED_WATER_KG;
@@ -82,7 +82,7 @@ namespace Robot
                     
                 velocitySimulator.OnNext(velocityNow);
                 bs.OnNext(correction);
-                if (Math.Abs(pressureNow - TARGET_PRESSURE) <= 0.005)
+                if (Math.Abs(pressureNow - TARGET_PRESSURE) <= 0.05)
                     stableCycles++;
                 else
                     stableCycles = 0;

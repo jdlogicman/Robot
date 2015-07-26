@@ -51,8 +51,10 @@
   </Choose>
   <ItemGroup>
     <Compile Include="ClamperTest.cs" />
+    <Compile Include="MockClock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SmootherTest.cs" />
+    <Compile Include="ButtonPressTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ControlLogic\ControlLogic.csproj">
