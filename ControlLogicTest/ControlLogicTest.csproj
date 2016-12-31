@@ -57,10 +57,6 @@
     <Compile Include="ButtonPressTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ControlLogic\ControlLogic.csproj">
-      <Project>{9bc7c56d-04f9-47e4-849a-a5f1d32cc1c4}</Project>
-      <Name>ControlLogic</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Simulation\Simulation.csproj">
       <Project>{b0382e7a-6335-4a04-9e9a-3305cb73aae3}</Project>
       <Name>Simulation</Name>

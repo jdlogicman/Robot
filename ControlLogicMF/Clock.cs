@@ -5,21 +5,22 @@ namespace ControlLogicMF
 {
     public class Clock : IClock, IDisposable
     {
-        System.Threading.Timer _timer;
+        readonly System.Threading.Timer _timer;
         event Types.Action _listeners;
         bool _running = true;
+        readonly int _interval;
         public void Dispose()
         {
             if (_running)
             {
                 _running = false;
                 _timer.Dispose();
-                _timer = null;
             }
         }
         public Clock(int pollIntervalMs)
         {
-            _timer = new System.Threading.Timer(Callback, null, 0, pollIntervalMs);
+            _interval = pollIntervalMs;
+            _timer = new System.Threading.Timer(Callback, null, _interval, -1);
         }
 
         private void Callback(object state)
@@ -30,6 +31,7 @@ namespace ControlLogicMF
             {
                 listeners();
             }
+            _timer.Change(_interval, -1);
         }
 
         public void Register(Types.Action callback)
