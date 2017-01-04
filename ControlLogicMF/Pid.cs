@@ -2,7 +2,7 @@
 
 namespace ControlLogicMF
 {
-    public class Pid : ObserverBase
+    public class Pid : IFilterValue
     {
         public Pid(double p, double i, double d)
         {
@@ -19,14 +19,14 @@ namespace ControlLogicMF
         double _lastError;
         double _integral;
 
-        public override void OnNext(double error)
+        public float Get(float error)
         {
             _integral += error;
             var derivative = error - _lastError;
 
             double control = _pidFactor * error + _integralFactor * _integral + _derivativeFactor * derivative;
-            base.OnNext(control);
             _lastError = error;
+            return (float)control;
         }
     }
 }

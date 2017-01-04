@@ -2,18 +2,20 @@
 
 namespace ControlLogicMF
 {
-    public class Clamper : ObserverBase
+    public class Clamper : IFilterValue
     {
-        public Clamper(double min, double max)
+        public Clamper(IFilterValue src, float min, float max)
         {
             _min = min;
             _max = max;
+            _src = src;
         }
-        double _min;
-        double _max;
-        override public void OnNext(double value)
+        float _min;
+        float _max;
+        IFilterValue _src;
+        public float Get(float val)
         {
-            base.OnNext(Math.Max(_min, Math.Min(_max, value)));
+            return (float)Math.Max(_min, Math.Min(_max, _src.Get(val)));
         }
     }
 }

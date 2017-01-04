@@ -17,7 +17,8 @@ namespace BuoyancyTester
             var clock = new Clock(50);
             var buttonPressCounter = new ButtonPressCounter(clock, 500);
             var pump = new Pump(clock, Pins.GPIO_PIN_18, Pins.GPIO_PIN_19);
-            _handler = new CommandHandler(clock, pump);
+            var pressureSensor = new PressureSensor(Pins.GPIO_PIN_5);
+            _handler = new CommandHandler(clock, pump, pressureSensor);
             button.OnPress += buttonPressCounter.RecordPress;
             buttonPressCounter.OnButtonStreamComplete += buttonPressCounter_OnButtonStreamComplete;
 

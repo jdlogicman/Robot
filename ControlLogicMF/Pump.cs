@@ -1,12 +1,11 @@
 using System;
 using Microsoft.SPOT.Hardware;
 using SecretLabs.NETMF.Hardware.NetduinoMini;
-using ControlLogicMF;
 using Microsoft.SPOT;
 
-namespace BuoyancyTester
+namespace ControlLogicMF
 {
-    class Pump 
+    public class Pump 
     {
         OutputPort _pumpOut;
         OutputPort _pumpIn;
