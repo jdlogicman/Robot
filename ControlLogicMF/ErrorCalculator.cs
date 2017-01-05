@@ -13,7 +13,7 @@ namespace ControlLogicMF
         readonly IHasValue _src;
         public float Get()
         {
-            return _targetValue - _src.Get(); ;
+            return _src.Get() - _targetValue;
         }
     }
 }
