@@ -13,11 +13,12 @@ namespace BuoyancyTester
         static CommandHandler _handler;
         public static void Main()
         {
+            var logger = new Logger();
             var button = new Button(Pins.GPIO_PIN_20);
             var clock = new Clock(50);
             var buttonPressCounter = new ButtonPressCounter(clock, 500);
-            var pump = new Pump(clock, Pins.GPIO_PIN_18, Pins.GPIO_PIN_19);
-            var pressureSensor = new PressureSensor(Pins.GPIO_PIN_5);
+            var pump = new Pump(clock, logger, new DigitalOutputPort(Pins.GPIO_PIN_18), new DigitalOutputPort(Pins.GPIO_PIN_19));
+            var pressureSensor = new PressureSensor(new AnalogSensor(Pins.GPIO_PIN_5));
             _handler = new CommandHandler(clock, pump, pressureSensor);
             button.OnPress += buttonPressCounter.RecordPress;
             buttonPressCounter.OnButtonStreamComplete += buttonPressCounter_OnButtonStreamComplete;

@@ -31,8 +31,11 @@
   </PropertyGroup>
   <Import Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
   <ItemGroup>
+    <Compile Include="AnalogSensor.cs" />
     <Compile Include="Button.cs" />
     <Compile Include="CommandHandler.cs" />
+    <Compile Include="DigitalPort.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Resources.Designer.cs">

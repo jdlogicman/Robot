@@ -1,41 +1,41 @@
 using System;
-using Microsoft.SPOT.Hardware;
-using SecretLabs.NETMF.Hardware.NetduinoMini;
-using Microsoft.SPOT;
+
 
 namespace ControlLogicMF
 {
     public class Pump 
     {
-        OutputPort _pumpOut;
-        OutputPort _pumpIn;
+        IDigitalOutputPort _pumpOut;
+        IDigitalOutputPort _pumpIn;
+        ILogger _log;
         DateTime _lastOperationStarted = DateTime.MinValue;
         TimeSpan _duration;
 
-        public Pump(IClock clock, Cpu.Pin outPin, Cpu.Pin inPin)
+        public Pump(IClock clock, ILogger log, IDigitalOutputPort output, IDigitalOutputPort input)
         {
-            _pumpOut = new OutputPort(outPin, false);
-            _pumpIn = new OutputPort(inPin, false);
+            _pumpOut = output;
+            _pumpIn = input;
+            _log = log;
             clock.Register(Poll);
         }
 
         public void PumpOut(TimeSpan duration)
         {
             Start(_pumpOut, duration);
-            Debug.Print("Pumping out for " + duration.Ticks / 10000 + "ms");
+            _log.Log("Pumping out for " + duration.Ticks / 10000 + "ms");
         }
         public void PumpIn(TimeSpan duration)
         {
             Start(_pumpOut, duration);
-            Debug.Print("Pumping in for " + duration.Ticks / 10000 + "ms");
+            _log.Log("Pumping in for " + duration.Ticks / 10000 + "ms");
         }
 
-        void Start(OutputPort port, TimeSpan duration)
+        void Start(IDigitalOutputPort port, TimeSpan duration)
         {
             Stop();
             _duration = duration;
             _lastOperationStarted = DateTime.Now;
-            port.Write(true);
+            port.Set(true);
         }
 
         void Poll()
@@ -53,10 +53,10 @@ namespace ControlLogicMF
         {
             if (_lastOperationStarted != DateTime.MinValue)
             {
-                _pumpIn.Write(false);
-                _pumpOut.Write(false);
+                _pumpIn.Set(false);
+                _pumpOut.Set(false);
                 _lastOperationStarted = DateTime.MinValue;
-                Debug.Print("Stopped pumping");
+                _log.Log("Stopped pumping");
             }
         }
     }
