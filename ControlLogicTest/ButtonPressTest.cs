@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ControlLogic;
+using ControlLogicMF;
 using System.Threading;
 
 namespace ControlLogicTest
@@ -9,42 +9,27 @@ namespace ControlLogicTest
     public class ButtonPressTest
     {
         [TestMethod]
-        public void TestDebounce()
+        public void Test()
         {
             uint count = 0;
-            MockClock mc = new MockClock();
-            ButtonPressCounter counter = new ButtonPressCounter(mc, TimeSpan.FromMilliseconds(10), TimeSpan.FromMilliseconds(50));
+            var clock = new Clock(50);
+            ButtonPressCounter counter = new ButtonPressCounter(clock, 50);
 
             counter.OnButtonStreamComplete += (c) => count = c;
-            mc.Start();
+            clock.Start();
 
             counter.RecordPress();
             counter.RecordPress();
             counter.RecordPress();
+            Thread.Sleep(200);
+            Assert.AreEqual<uint>(3, count);
+            count = 0;
+            counter.RecordPress();
+            Assert.AreEqual<uint>(0, count);
             Thread.Sleep(100);
             Assert.AreEqual<uint>(1, count);
-            mc.Stop();
+            clock.Stop();
         }
 
-        [TestMethod]
-        public void TestStream()
-        {
-            MockClock mc = new MockClock();
-            
-            uint count = 0;
-            ButtonPressCounter counter = new ButtonPressCounter(mc, TimeSpan.FromMilliseconds(10), TimeSpan.FromMilliseconds(100));
-
-            counter.OnButtonStreamComplete += (c) => count = c;
-            mc.Start();
-
-            counter.RecordPress();
-            Thread.Sleep(11);
-            counter.RecordPress();
-            Thread.Sleep(11);
-            Assert.AreEqual(0u, count);
-            Thread.Sleep(300);
-            Assert.AreEqual(2u, count);
-            mc.Stop();
-        }
     }
 }

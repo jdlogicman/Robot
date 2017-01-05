@@ -2,16 +2,18 @@ using System;
 
 namespace ControlLogicMF
 {
-    public class ErrorCalculator : IFilterValue
+    public class ErrorCalculator : IHasValue
     {
-        public ErrorCalculator(float targetValue)
+        public ErrorCalculator(IHasValue src, float targetValue)
         {
             _targetValue = targetValue;
+            _src = src;
         }
         readonly float _targetValue;
-        public float Get(float input)
+        readonly IHasValue _src;
+        public float Get()
         {
-            return _targetValue - input;
+            return _targetValue - _src.Get(); ;
         }
     }
 }

@@ -2,20 +2,20 @@ using System;
 
 namespace ControlLogicMF
 {
-    public class AbsValueFilter : IFilterValue
+    public class AbsValueFilter : IHasValue
     {
         readonly float _min;
-        readonly IFilterValue _src;
-        public AbsValueFilter(IFilterValue src, float minAbsValue)
+        readonly IHasValue _src;
+        public AbsValueFilter(IHasValue src, float minAbsValue)
         {
             _min = minAbsValue;
             _src = src;
         }
 
 
-        public float Get(float input)
+        public float Get()
         {
-            var val = _src.Get(input);
+            var val = _src.Get();
             if (System.Math.Abs(val) <= _min)
                 return 0;
             return val;

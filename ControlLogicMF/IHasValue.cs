@@ -6,9 +6,5 @@ namespace ControlLogicMF
     {
         float Get();
     }
-    public interface IFilterValue
-    {
-        float Get(float input);
-    }
-
+    
 }

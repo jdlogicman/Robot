@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ControlLogic;
-using Simulation;
+using ControlLogicMF;
+using System.Collections.Generic;
 
 namespace ControlLogicTest
 {
@@ -11,16 +11,11 @@ namespace ControlLogicTest
         [TestMethod]
         public void TestMinMaxMiddle()
         {
-            Clamper c = new Clamper(-0.5, 3.5);
-            double value = 0;
-            c.AddObserver(new LambdaObserver((d) => value = d));
-
-            c.OnNext(-10);
-            Assert.AreEqual(-0.5, value);
-            c.OnNext(10);
-            Assert.AreEqual(3.5, value);
-            c.OnNext(2.1);
-            Assert.AreEqual(2.1, value);
+            var src = new ValueSrc(new float[] { -10f, 10f, 2.1f });
+            Clamper c = new Clamper(src, -0.5f, 3.5f);
+            Assert.AreEqual(-0.5, c.Get());
+            Assert.AreEqual(3.5, c.Get());
+            Assert.IsTrue(Math.Abs(2.1 - c.Get()) < 0.1);
         }
     }
 }

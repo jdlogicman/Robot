@@ -2,9 +2,9 @@
 
 namespace ControlLogicMF
 {
-    public class Clamper : IFilterValue
+    public class Clamper : IHasValue
     {
-        public Clamper(IFilterValue src, float min, float max)
+        public Clamper(IHasValue src, float min, float max)
         {
             _min = min;
             _max = max;
@@ -12,10 +12,10 @@ namespace ControlLogicMF
         }
         float _min;
         float _max;
-        IFilterValue _src;
-        public float Get(float val)
+        IHasValue _src;
+        public float Get()
         {
-            return (float)Math.Max(_min, Math.Min(_max, _src.Get(val)));
+            return (float)Math.Max(_min, Math.Min(_max, _src.Get()));
         }
     }
 }

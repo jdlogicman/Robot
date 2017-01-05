@@ -24,9 +24,7 @@ namespace BuoyancyTester
         IHasValue _pressureSensor;
         
         float _targetPressure;
-        IFilterValue _pressureController;
-        IFilterValue _pressureErrorCalculator;
-        IFilterValue _velocityController;
+        IHasValue _velocityController;
         
         const float MAX_PRESSURE_CORRECTION = 0.2F;
         const float MIN_PRESSURE_CORRECTION = -0.2F;
@@ -47,10 +45,7 @@ namespace BuoyancyTester
             {
                 // TODO: only correct once every 5 seconds
 
-                var currentPressure = _pressureSensor.Get();
-                var pressureError = _pressureErrorCalculator.Get(currentPressure);
-                var pressureCorrection = _pressureController.Get(pressureError);
-                var velocityCorrection = _velocityController.Get(pressureCorrection);
+                var velocityCorrection = _velocityController.Get();
                 if (velocityCorrection < 0)
                     _pump.PumpIn(new TimeSpan((long)(System.Math.Abs(velocityCorrection) * PUMP_CORRECTION_SCALE_VALUE)));
                 else if (velocityCorrection > 0)
@@ -63,16 +58,20 @@ namespace BuoyancyTester
             switch (cmd)
             {
                 case Command.MaintainPosition:
+                    // this mode maintains the current pressure, whatever that is - so read it
                     _targetPressure = _pressureSensor.Get();
-                    // clamp the error to a narrow range
-                    // we don't care to make large corrections, but rather to take time getting there
-                    _pressureErrorCalculator = new AbsValueFilter(
-                        new Clamper(new ErrorCalculator(_targetPressure), MIN_PRESSURE_CORRECTION, MAX_PRESSURE_CORRECTION),
-                        MIN_ABS_PRESSURE_ERROR_TO_CORRECT);
-                    // simple proportional control for pressure
-                    _pressureController = new Pid(-2, 0, 0);
-                    // for velocity, don't 
-                    _velocityController = new Pid(-0.5, 0, 0);
+                    {
+                        // clamp the error to a narrow range
+                        // we don't care to make large corrections, but rather to take time getting there
+                        var pressureErrorCalculator = new AbsValueFilter(
+                            new Clamper(
+                                new ErrorCalculator(_pressureSensor, _targetPressure), MIN_PRESSURE_CORRECTION, MAX_PRESSURE_CORRECTION),
+                            MIN_ABS_PRESSURE_ERROR_TO_CORRECT);
+                        // simple proportional control for pressure
+                        var pressureController = new Pid(pressureErrorCalculator, -2, 0, 0);
+                        // for velocity, we might need some I. TODO - tune parameters
+                        _velocityController = new Pid(pressureController, -0.5, 0, 0);
+                    }
                     ChangeState(State.MaintainingPosition);
                     _pump.Stop();
                     break;

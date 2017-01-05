@@ -2,25 +2,28 @@
 
 namespace ControlLogicMF
 {
-    public class Pid : IFilterValue
+    public class Pid : IHasValue
     {
-        public Pid(double p, double i, double d)
+        public Pid(IHasValue src, double p, double i, double d)
         {
             _pidFactor = p;
             _integralFactor = i;
             _derivativeFactor = d;
+            _src = src;
         }
 
   
         readonly double _pidFactor;
         readonly double _integralFactor;
         readonly double _derivativeFactor;
+        readonly IHasValue _src;
 
         double _lastError;
         double _integral;
 
-        public float Get(float error)
+        public float Get()
         {
+            var error = _src.Get();
             _integral += error;
             var derivative = error - _lastError;
 
