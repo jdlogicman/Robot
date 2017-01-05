@@ -25,11 +25,12 @@ namespace BuoyancyTester
         
         float _targetPressure;
         IFilterValue _pressureController;
+        IFilterValue _pressureErrorCalculator;
         IFilterValue _velocityController;
         
         const float MAX_PRESSURE_CORRECTION = 0.2F;
         const float MIN_PRESSURE_CORRECTION = -0.2F;
-        const float MIN_ABS_VELOCITY_TO_CORRECT = 0.001F; // TODO: standardize time units
+        const float MIN_ABS_PRESSURE_ERROR_TO_CORRECT = 1.0F / 33;
         const float PUMP_CORRECTION_SCALE_VALUE = 1000; // TODO
 
 
@@ -47,11 +48,8 @@ namespace BuoyancyTester
                 // TODO: only correct once every 5 seconds
 
                 var currentPressure = _pressureSensor.Get();
-                var pressureError = _targetPressure - currentPressure;
-                // clamp the pressure
-                var pressureCorrection = (float)System.Math.Min(MAX_PRESSURE_CORRECTION, 
-                                            System.Math.Max(MIN_PRESSURE_CORRECTION, 
-                                            _pressureController.Get(pressureError)));
+                var pressureError = _pressureErrorCalculator.Get(currentPressure);
+                var pressureCorrection = _pressureController.Get(pressureError);
                 var velocityCorrection = _velocityController.Get(pressureCorrection);
                 if (velocityCorrection < 0)
                     _pump.PumpIn(new TimeSpan((long)(System.Math.Abs(velocityCorrection) * PUMP_CORRECTION_SCALE_VALUE)));
@@ -66,8 +64,15 @@ namespace BuoyancyTester
             {
                 case Command.MaintainPosition:
                     _targetPressure = _pressureSensor.Get();
-                    _pressureController = new Clamper(new Pid(-2, 0, 0), MIN_PRESSURE_CORRECTION, MAX_PRESSURE_CORRECTION);
-                    _velocityController = new AbsValueFilter(new Pid(-0.5, 0, 0), MIN_ABS_VELOCITY_TO_CORRECT);
+                    // clamp the error to a narrow range
+                    // we don't care to make large corrections, but rather to take time getting there
+                    _pressureErrorCalculator = new AbsValueFilter(
+                        new Clamper(new ErrorCalculator(_targetPressure), MIN_PRESSURE_CORRECTION, MAX_PRESSURE_CORRECTION),
+                        MIN_ABS_PRESSURE_ERROR_TO_CORRECT);
+                    // simple proportional control for pressure
+                    _pressureController = new Pid(-2, 0, 0);
+                    // for velocity, don't 
+                    _velocityController = new Pid(-0.5, 0, 0);
                     ChangeState(State.MaintainingPosition);
                     _pump.Stop();
                     break;

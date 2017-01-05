@@ -35,6 +35,7 @@
     <Compile Include="Averager.cs" />
     <Compile Include="ButtonPressCounter.cs" />
     <Compile Include="Clamper.cs" />
+    <Compile Include="ErrorCalculator.cs" />
     <Compile Include="IClock.cs" />
     <Compile Include="IHasValue.cs" />
     <Compile Include="Pid.cs" />
