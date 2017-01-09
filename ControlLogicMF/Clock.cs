@@ -2,6 +2,11 @@ using System;
 
 namespace ControlLogicMF
 {
+    /// <summary>
+    /// A simple class that generates notifications approximately at the polling interval.
+    /// Guarantees that all handlers have completed before the next notification, even if that
+    /// means delaying notification (i.e. guarantees no reentrancy issues).
+    /// </summary>
     public class Clock : IClock, IDisposable
     {
         readonly System.Threading.Timer _timer;

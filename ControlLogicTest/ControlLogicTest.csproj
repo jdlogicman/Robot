@@ -55,6 +55,7 @@
     <Compile Include="AveragerTest.cs" />
     <Compile Include="ButtonPressTest.cs" />
     <Compile Include="PidTest.cs" />
+    <Compile Include="PumpTest.cs" />
     <Compile Include="ValueSrc.cs" />
   </ItemGroup>
   <ItemGroup>

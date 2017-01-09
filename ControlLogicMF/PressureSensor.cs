@@ -5,7 +5,8 @@ using System;
 namespace ControlLogicMF
 {
     /// <summary>
-    /// This class models the Dwyer relative pressure sensor.
+    /// This class models the Dwyer relative pressure sensor in that the analog
+    /// voltage varies linearly with pressure.
     /// </summary>
     public class PressureSensor : IHasValue
     {
@@ -17,6 +18,10 @@ namespace ControlLogicMF
             _voltsPerBar = voltsPerBar;
         }
         
+        /// <summary>
+        /// Gets the current value as atmospheric pressure (bar) ATA units
+        /// </summary>
+        /// <returns></returns>
         public float Get()
         {
             var volts = _input.Get();

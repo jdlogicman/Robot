@@ -3,6 +3,12 @@ using System;
 
 namespace ControlLogicMF
 {
+    /// <summary>
+    /// The pump in this case allows pumping in our out. It is open loop, and runs for a
+    /// specified period of time.
+    /// Relies on the proved clock for notifications. The actual low-level control for the
+    /// pump is injected as constructor params.
+    /// </summary>
     public class Pump 
     {
         IDigitalOutputPort _pumpOut;
@@ -16,6 +22,9 @@ namespace ControlLogicMF
             _pumpOut = output;
             _pumpIn = input;
             _log = log;
+            _pumpIn.Set(false);
+            _pumpOut.Set(false);
+            
             clock.Register(Poll);
         }
 
@@ -26,7 +35,7 @@ namespace ControlLogicMF
         }
         public void PumpIn(TimeSpan duration)
         {
-            Start(_pumpOut, duration);
+            Start(_pumpIn, duration);
             _log.Log("Pumping in for " + duration.Ticks / 10000 + "ms");
         }
 
