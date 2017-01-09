@@ -49,20 +49,37 @@ namespace ControlLogicTest
         }
 
         [TestMethod]
-        public void TestNoCorrectionIfVelocityIsMiniscule()
+        public void TestNoCorrectionIfErrorIsMiniscule()
         {
+            var pressure = new MockHasOneValue(0.5f);
+            var loop = new PressureControlLoop(_clock, _pump, pressure, TimeSpan.FromMilliseconds(100));
+            loop.Enable(0.51f);
+            Thread.Sleep(500);
+            Assert.AreEqual(0, _in.Activations + _out.Activations);
+            loop.Enable(0.49f);
+            Thread.Sleep(500);
+            Assert.AreEqual(0, _in.Activations + _out.Activations);
         }
         [TestMethod]
         public void TestCorrectionPositive()
         {
+            var pressure = new MockHasOneValue(0.5f);
+            var loop = new PressureControlLoop(_clock, _pump, pressure, TimeSpan.FromMilliseconds(100));
+            loop.Enable(0.6f);
+            Thread.Sleep(500);
+            Assert.AreEqual(0, _in.Activations);
+            Assert.AreNotEqual(0, _out.Activations);
         }
         [TestMethod]
         public void TestCorrectionNegative()
         {
+            var pressure = new MockHasOneValue(0.5f);
+            var loop = new PressureControlLoop(_clock, _pump, pressure, TimeSpan.FromMilliseconds(100));
+            loop.Enable(0.4f);
+            Thread.Sleep(500);
+            Assert.AreNotEqual(0, _in.Activations);
+            Assert.AreEqual(0, _out.Activations);
         }
-        [TestMethod]
-        public void TestCorrectionMaxesOut()
-        {
-        }
+        
     }
 }

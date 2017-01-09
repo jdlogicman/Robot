@@ -38,7 +38,7 @@ namespace ControlLogicMF
             // simple proportional control for pressure
             var pressureController = new Pid(pressureErrorCalculator, -2, 0, 0);
             // for velocity, we might need some I. TODO - tune parameters
-            _velocityController = new Pid(pressureController, -0.5, 0, 0);
+            _velocityController = new Pid(pressureController, 0.5, 0, 0);
             
             _lastControl = DateTime.Now;
         }
