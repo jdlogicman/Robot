@@ -41,6 +41,7 @@
     <Compile Include="IHasValue.cs" />
     <Compile Include="ILog.cs" />
     <Compile Include="Pid.cs" />
+    <Compile Include="PressureControlLoop.cs" />
     <Compile Include="PressureSensor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Clock.cs" />

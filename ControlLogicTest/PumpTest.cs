@@ -7,29 +7,6 @@ using System.Threading;
 
 namespace ControlLogicTest
 {
-	class MockDigitalPort : IDigitalOutputPort
-	{
-		public bool State { get; set; }
-		public TimeSpan Duration { get; private set; }
-		DateTime _triggered;
-
-        public MockDigitalPort() { State = true; }
-		public void Set(bool val)
-		{
-			if (!State && val)
-				_triggered = DateTime.Now;
-			else if (State && !val)
-				Duration = DateTime.Now - _triggered;
-			
-			State = val;
-		}
-	}
-	class MockLog : ILogger
-	{
-		public void Log(string s) {}
-	}
-		
-			
     [TestClass]
     public class PumpTest
     {
