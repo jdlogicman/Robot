@@ -39,11 +39,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LambdaObserver.cs" />
-    <Compile Include="LogObserver.cs" />
+    <Compile Include="LambdaHasValue.cs" />
     <Compile Include="PressureSimulation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VelocitySimulation.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ControlLogicMF\ControlLogic.csproj">
+      <Project>{9bc7c56d-04f9-47e4-849a-a5f1d32cc1c4}</Project>
+      <Name>ControlLogic</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

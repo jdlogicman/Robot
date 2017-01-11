@@ -4,7 +4,7 @@ namespace ControlLogicMF
 {
     public class Pid : IHasValue
     {
-        public Pid(IHasValue src, double p, double i, double d)
+        public Pid(IHasValue src, float p, float i, float d)
         {
             _pidFactor = p;
             _integralFactor = i;
@@ -13,13 +13,13 @@ namespace ControlLogicMF
         }
 
   
-        readonly double _pidFactor;
-        readonly double _integralFactor;
-        readonly double _derivativeFactor;
+        readonly float _pidFactor;
+        readonly float _integralFactor;
+        readonly float _derivativeFactor;
         readonly IHasValue _src;
 
-        double _lastError;
-        double _integral;
+        float _lastError;
+        float _integral;
 
         public float Get()
         {
@@ -27,7 +27,7 @@ namespace ControlLogicMF
             _integral += error;
             var derivative = error - _lastError;
 
-            double control = _pidFactor * error + _integralFactor * _integral + _derivativeFactor * derivative;
+            float control = _pidFactor * error + _integralFactor * _integral + _derivativeFactor * derivative;
             _lastError = error;
             return (float)control;
         }

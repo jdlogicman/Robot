@@ -3,6 +3,14 @@ using System;
 
 namespace ControlLogicMF
 {
+    /// <summary>
+    /// A control loop to maintain a target pressure.
+    /// Since I want a gradual convergence, I'm doing control on desired target velocity:
+    /// - calculate the pressure error
+    /// - calculate the desired target velocity by applying a scalar and clamping to +/- MAX_VELOCITY
+    /// - use the desired target velocity - actual velocity as the error in a PID control loop
+    /// Note that the PID parameters are tied to the control loop period.
+    /// </summary>
     public class PressureControlLoop
     {
         readonly Pump _pump;
@@ -38,7 +46,7 @@ namespace ControlLogicMF
             // simple proportional control for pressure
             var pressureController = new Pid(pressureErrorCalculator, -2, 0, 0);
             // for velocity, we might need some I. TODO - tune parameters
-            _velocityController = new Pid(pressureController, 0.5, 0, 0);
+            _velocityController = new Pid(pressureController, 0.5f, 0, 0);
             
             _lastControl = DateTime.Now;
         }

@@ -11,7 +11,7 @@ namespace SimulationTest
         [TestMethod]
         public void VerifyAccelerationPositiveMassNoDrag()
         {
-            double newVelocity = VelocitySimulation.CalculateNewVelocity(0, volume:0, areaFacingDirectionOfTravel: 0);
+            float newVelocity = VelocitySimulation.CalculateNewVelocity(0, volume:0, areaFacingDirectionOfTravel: 0);
             Assert.IsTrue(Math.Abs(newVelocity - VelocitySimulation.GRAVITY) < 0.01);
             newVelocity = VelocitySimulation.CalculateNewVelocity(-1 * VelocitySimulation.GRAVITY, volume: 0, areaFacingDirectionOfTravel: 0);
             Assert.IsTrue(Math.Abs(newVelocity) < 0.01);
@@ -29,7 +29,7 @@ namespace SimulationTest
         [TestMethod]
         public void VerifyTerminalVelocityReached()
         {
-            List<double> velocities = new List<double> { 0 };
+            List<float> velocities = new List<float> { 0 };
             const int MAX_ITER = 10000;
             while (velocities.Count < MAX_ITER)
                 velocities.Add(VelocitySimulation.CalculateNewVelocity(velocities.Last()));

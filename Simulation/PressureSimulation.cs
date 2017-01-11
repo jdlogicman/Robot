@@ -8,10 +8,10 @@ namespace Simulation
 {
     public class PressureSimulation
     {
-        public const double BAR_PER_M = 0.1;
-        public static double CalculatePressure(double velocityNow, double pressureNow, uint deltaTInMilliSeconds = 1000)
+        public const float BAR_PER_M = 0.1f;
+        public static float CalculatePressure(float velocityNow, float pressureNow, uint deltaTInMilliSeconds = 1000)
         {
-            return Math.Max(0, pressureNow + velocityNow * (deltaTInMilliSeconds / 1000.0) * BAR_PER_M);
+            return (float)Math.Max(0, pressureNow + velocityNow * (deltaTInMilliSeconds / 1000.0) * BAR_PER_M);
 
         }
     }
