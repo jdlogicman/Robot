@@ -1,7 +1,7 @@
 using System;
 
 
-namespace ControlLogicMF
+namespace ControlLogic
 {
     /// <summary>
     /// The pump in this case allows pumping in our out. It is open loop, and runs for a

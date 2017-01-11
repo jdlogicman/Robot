@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ControlLogicMF;
+using ControlLogic;
 
 namespace ControlLogicTest
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace ControlLogicMF
+namespace ControlLogic
 {
     public class ButtonPressCounter 
     {

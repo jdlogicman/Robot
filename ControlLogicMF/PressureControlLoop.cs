@@ -1,7 +1,7 @@
 using System;
 
 
-namespace ControlLogicMF
+namespace ControlLogic
 {
     /// <summary>
     /// A control loop to maintain a target pressure.

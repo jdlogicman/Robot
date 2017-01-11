@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ControlLogicMF;
+using ControlLogic;
 using System.Threading;
 
 namespace ControlLogicTest

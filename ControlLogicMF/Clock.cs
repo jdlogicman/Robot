@@ -1,6 +1,6 @@
 using System;
 
-namespace ControlLogicMF
+namespace ControlLogic
 {
     /// <summary>
     /// A simple class that generates notifications approximately at the polling interval.

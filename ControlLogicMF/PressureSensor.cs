@@ -2,7 +2,7 @@ using System;
 
 
 
-namespace ControlLogicMF
+namespace ControlLogic
 {
     /// <summary>
     /// This class models the Dwyer relative pressure sensor in that the analog

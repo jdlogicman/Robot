@@ -2,7 +2,7 @@
 using System.Text;
 
 
-namespace ControlLogicMF
+namespace ControlLogic
 {
     public interface INotificationHandle
     {

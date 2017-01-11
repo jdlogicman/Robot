@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ControlLogicMF
+namespace ControlLogic
 {
     public class Clamper : IHasValue
     {

@@ -39,6 +39,7 @@
     <Compile Include="Averager.cs" />
     <Compile Include="ButtonPressCounter.cs" />
     <Compile Include="Clamper.cs" />
+    <Compile Include="DerivativeCalculator.cs" />
     <Compile Include="IDigitalPort.cs" />
     <Compile Include="ErrorCalculator.cs" />
     <Compile Include="IClock.cs" />
