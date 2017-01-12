@@ -45,6 +45,7 @@
     <Compile Include="IClock.cs" />
     <Compile Include="IHasValue.cs" />
     <Compile Include="ILog.cs" />
+    <Compile Include="LambdaHasValue.cs" />
     <Compile Include="Pid.cs" />
     <Compile Include="PressureControlLoop.cs" />
     <Compile Include="PressureSensor.cs" />

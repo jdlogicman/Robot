@@ -26,37 +26,44 @@ namespace ControlLogic
         readonly IHasValue _pressureSensor;
         DateTime _lastControl;
         TimeSpan _controlInterval;
+        float _currentPressureReading;
 
         IHasValue _velocityController;
 
-        const float MAX_PRESSURE_CORRECTION = 0.2F;
-        const float MIN_PRESSURE_CORRECTION = -0.2F;
-        const float MIN_ABS_PRESSURE_ERROR_TO_CORRECT = 1.0F / 33;
-        const float PUMP_CORRECTION_SCALE_VALUE = 1000; // TODO
+        const float PUMP_CORRECTION_SCALE_VALUE = 1000; // transform from sec to millisec
+        const float MAX_ABS_VELOCITY = 0.2f; // bar/s
 
+        private readonly ControlParameters _controlParameters;
 
-        public PressureControlLoop(IClock clock, Pump pump, IHasValue pressureSensor, TimeSpan controlInterval)
+        public PressureControlLoop(IClock clock, Pump pump, IHasValue pressureSensor,
+            ControlParameters controlParams, TimeSpan controlInterval)
         {
             _pressureSensor = pressureSensor;
             _pump = pump;
             _controlInterval = controlInterval;
+            _controlParameters = controlParams;
             clock.Register(Poll);
         }
 
         public void Enable(float targetPressure)
         {
             _pump.Stop();
-            // clamp the error to a narrow range
-            // we don't care to make large corrections, but rather to take time getting there
-            var pressureErrorCalculator = new AbsValueFilter(
-                new Clamper(
-                    new ErrorCalculator(_pressureSensor, targetPressure), MIN_PRESSURE_CORRECTION, MAX_PRESSURE_CORRECTION),
-                MIN_ABS_PRESSURE_ERROR_TO_CORRECT);
-            // simple proportional control for pressure
-            var pressureController = new Pid(pressureErrorCalculator, -2, 0, 0);
-            // for velocity, we might need some I. TODO - tune parameters
-            _velocityController = new Pid(pressureController, 0.5f, 0, 0);
-            
+            var pressureErrorCalculator = new LambdaHasValue(() => _currentPressureReading - targetPressure);
+
+            var pressureController = new Pid(pressureErrorCalculator,
+                _controlParameters.PressureP, _controlParameters.PressureI, _controlParameters.PressureD);
+
+            var velocity = new DerivativeCalculator(new LambdaHasValue(() => _currentPressureReading));
+
+            var velocityErrorCalculator = new Clamper(new LambdaHasValue(() =>
+                {
+                    return velocity.Get() - pressureController.Get();
+
+                }), -MAX_ABS_VELOCITY, MAX_ABS_VELOCITY);
+
+            _velocityController = new Pid(velocityErrorCalculator, 
+                _controlParameters.VelocityP, _controlParameters.VelocityI, _controlParameters.VelocityD);
+
             _lastControl = DateTime.Now;
         }
         public void Disable()
@@ -73,10 +80,11 @@ namespace ControlLogic
                 var interval = DateTime.Now - _lastControl;
                 if (interval >= _controlInterval)
                 {
+                    _currentPressureReading = _pressureSensor.Get();
                     var velocityCorrection = _velocityController.Get();
-                    if (velocityCorrection < 0)
+                    if (velocityCorrection > 0)
                         _pump.PumpIn(new TimeSpan((long)(System.Math.Abs(velocityCorrection) * PUMP_CORRECTION_SCALE_VALUE)));
-                    else if (velocityCorrection > 0)
+                    else if (velocityCorrection < 0)
                         _pump.PumpOut(new TimeSpan((long)(velocityCorrection * PUMP_CORRECTION_SCALE_VALUE)));
         
                 }

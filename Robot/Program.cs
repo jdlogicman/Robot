@@ -100,13 +100,9 @@ namespace Robot
             var velocityErrorCalculator = new ValueRecorder((v) => values["ve"] = v,
                 new Clamper(new LambdaHasValue(() =>
                 {
-                    // If velocity is at the rails (+/- MAX) then there is no error - we're topped out
-                    // if velocity is in the control range, do normal control.
                     var velocityBarPerSecond = velocityNowMetersPerSecond / METERS_PER_BAR;
-                    var error = velocityBarPerSecond - pressureController.Get();
-                    if (velocityBarPerSecond >= MAX_ABS_VELOCITY || velocityBarPerSecond <= -MAX_ABS_VELOCITY)
-                        error = 0;
-                    return error;
+                    return velocityBarPerSecond - pressureController.Get();
+                    
                 }), -MAX_ABS_VELOCITY, MAX_ABS_VELOCITY));
 
             var velocityController = new ValueRecorder((v) => values["vc"] = v, 

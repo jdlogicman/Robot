@@ -39,7 +39,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LambdaHasValue.cs" />
     <Compile Include="PressureSimulation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VelocitySimulation.cs" />

@@ -1,7 +1,6 @@
 ﻿using System;
-using ControlLogic;
 
-namespace Simulation
+namespace ControlLogic
 {
     public class LambdaHasValue : IHasValue
     {
