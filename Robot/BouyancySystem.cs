@@ -4,7 +4,7 @@ namespace Robot
 {
     public class BouyancySystem 
     {
-        public const float MAX_LOAD_KG = 5;
+        public const float MAX_LOAD_KG = 10;
 
         public float WaterMass { get; private set; }
 

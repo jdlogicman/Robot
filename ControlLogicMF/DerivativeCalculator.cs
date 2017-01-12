@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ControlLogic
 {
-    class DerivativeCalculator : IHasValue
+    public class DerivativeCalculator : IHasValue
     {
         float _lastValue;
         DateTime _lastSample = DateTime.MinValue;
@@ -22,7 +22,7 @@ namespace ControlLogic
             var result = 0f;
             var newValue = _src.Get();
             var now = DateTime.Now;
-            if (_lastSample != DateTime.MinValue)
+            if (_lastSample != DateTime.MinValue && _lastSample != now)
             {
                 result = (newValue - _lastValue) / (float)(now - _lastSample).TotalSeconds;
             }

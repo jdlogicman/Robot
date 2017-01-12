@@ -8,61 +8,122 @@ namespace Robot
 {
     class Program
     {
+        const float TARGET_PRESSURE = 2; // bar, relative to surface
+        const float MAX_ABS_VELOCITY = 0.2f; // bar/s
+        const float METERS_PER_BAR = 10f;
+        const uint DELTA_T_MS = 3000;
+
+
+
         static void Main(string[] args)
         {
-            // given a target pressure, initial velocity, and mass 
-            
-            const float TARGET_PRESSURE = 2; // bar, relative to surface
-            const float MAX_ABS_VELOCITY = 2; // m/s
-            const uint DELTA_T_MS = 3000;
+#if false
+            float pressureStart = -0.3f;
+            float pressureEnd = -5f;
+            float velocityStart = -0.3f;
+            float velocityEnd = -10f;
+            float step = 0.1f;
+
+
+            var results = new SortedDictionary<int, List<ControlParameters>>();
+            for (var pp = pressureStart; pp >= pressureEnd; pp -= step)
+                for (var pd = pressureStart; pd >= pressureEnd; pd -= step)
+                    for (var vp = velocityStart; vp >= velocityEnd; vp -= step)
+                        for (var vd = velocityStart; vd >= velocityEnd; vd -= step)
+                        {
+                            var p = new ControlParameters
+                            {
+                                PressureP = pp,
+                                PressureD = pd,
+                                VelocityP = vp,
+                                VelocityD = vd
+
+                            };
+                            var result = RunSimulation(p);
+                            List<ControlParameters> others;
+                            if (!results.TryGetValue(result, out others))
+                                results[result] = others = new List<ControlParameters> { p };
+                            else
+                                others.Add(p);
+                            if (results.Count > 10)
+                                foreach (var key in results.Keys.Skip(10).ToArray())
+                                    results.Remove(key);
+                        }
+            using (var file = System.IO.File.CreateText(@"c:\users\jduddy\params.txt"))
+            {
+                foreach (var kvp in results)
+                {
+                    file.WriteLine(kvp.Key.ToString());
+                    foreach (var v in kvp.Value)
+                        file.WriteLine($"PressureP={v.PressureP},PressureD={v.PressureD},VelocityP={v.VelocityP},VelocityD={v.VelocityD}");
+                }
+            }
+#else
+            var controlArgs = new ControlParameters { PressureP = -0.3f, PressureD = -0.3f, VelocityP = -9.3f, VelocityD = -7.9f };
+            RunSimulation(controlArgs, true);
+#endif
+        }
+
+        static int RunSimulation(ControlParameters p, bool printResults = false)
+        {
             float pressureNow = 0;
-            float velocityNow = 0;
+            float velocityNowMetersPerSecond = 0;
             float correction = 0;
             BouyancySystem bs = new BouyancySystem();
-
+            var values = new Dictionary<string, float>();
+            
             var velocitySimulator = new LambdaHasValue(() =>
                 {
-                    var newVelocity = VelocitySimulation.CalculateNewVelocity(velocityNow,
+                    var newVelocity = VelocitySimulation.CalculateNewVelocity(velocityNowMetersPerSecond,
                         deltaTInMilliSeconds: DELTA_T_MS,
                         mass: VelocitySimulation.DEFAULT_MASS_KG + bs.WaterMass);
                     if (pressureNow == 0.0 && newVelocity < 0.0)
                         newVelocity = 0;
-                    velocityNow = newVelocity;
+                    velocityNowMetersPerSecond = newVelocity;
+                    values["velocity"] = velocityNowMetersPerSecond;
                     return newVelocity; 
                 });
             
             var pressureSimulator = new LambdaHasValue(() =>
                 {
                     pressureNow = PressureSimulation.CalculatePressure(velocitySimulator.Get(), pressureNow, deltaTInMilliSeconds:DELTA_T_MS);
+                    values["pressure"] = pressureNow;
                     return pressureNow;
                 });
             
-            var pressureErrorCalculator = new LambdaHasValue(() => pressureSimulator.Get() - TARGET_PRESSURE);
+            var pressureErrorCalculator = new ValueRecorder((v) => values["pe"] = v, 
+                new LambdaHasValue(() => pressureSimulator.Get() - TARGET_PRESSURE));
             
-            var pressureController = new Pid(pressureErrorCalculator, -2, 0, 0);
+            var pressureController = new ValueRecorder((v) => values["pc"] = v, 
+                new Pid(pressureErrorCalculator, p.PressureP, p.PressureI, p.PressureD));
 
-            var velocityErrorCalculator = new Clamper(new LambdaHasValue(() =>
+            var velocityErrorCalculator = new ValueRecorder((v) => values["ve"] = v,
+                new Clamper(new LambdaHasValue(() =>
                 {
-                    return velocityNow - pressureController.Get();
-                }), - MAX_ABS_VELOCITY, MAX_ABS_VELOCITY);
+                    // If velocity is at the rails (+/- MAX) then there is no error - we're topped out
+                    // if velocity is in the control range, do normal control.
+                    var velocityBarPerSecond = velocityNowMetersPerSecond / METERS_PER_BAR;
+                    var error = velocityBarPerSecond - pressureController.Get();
+                    if (velocityBarPerSecond >= MAX_ABS_VELOCITY || velocityBarPerSecond <= -MAX_ABS_VELOCITY)
+                        error = 0;
+                    return error;
+                }), -MAX_ABS_VELOCITY, MAX_ABS_VELOCITY));
 
-            var velocityController = new Pid(velocityErrorCalculator, -0.2f, 0, -1f);
+            var velocityController = new ValueRecorder((v) => values["vc"] = v, 
+                new Pid(velocityErrorCalculator, p.VelocityP, p.VelocityI, p.VelocityD));
 
 
             int cycles = 0;
             int stableCycles = 0;
 
-            var values = new Dictionary<string, float>();
             
-            while (cycles++ < 1000000 && stableCycles < 5 )
+            while (cycles++ < 100 && stableCycles < 5 )
             {
                 correction = velocityController.Get();
                 bs.OnNext(correction);
-                values["correction"] = correction;
-                values["velocity"] = velocityNow;
-                values["pressure"] = pressureNow;
-                values["ballastMass"] = bs.WaterMass;
-                Console.WriteLine(cycles.ToString() + " " + string.Join("\t", from kvp in values select string.Format("{0}:{1:F3}", kvp.Key, kvp.Value)));
+                values["bm"] = bs.WaterMass;
+                if (printResults)
+                    Console.WriteLine(cycles.ToString() + " " + string.Join("\t", from kvp in values select string.Format("{0}:{1:F3}", kvp.Key, kvp.Value)));
                 
                     
                 bs.OnNext(correction);
@@ -71,7 +132,8 @@ namespace Robot
                 else
                     stableCycles = 0;
             }
-            Console.WriteLine("Total cycles: {0}", cycles);
+            if (printResults) Console.WriteLine("Total cycles: {0}", cycles);
+            return cycles;
 
         }
     }

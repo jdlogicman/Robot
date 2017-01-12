@@ -3,6 +3,15 @@ using System;
 
 namespace ControlLogic
 {
+    public class ControlParameters
+    {
+        public float PressureP { get; set; }
+        public float PressureI { get; set; }
+        public float PressureD { get; set; }
+        public float VelocityP { get; set; }
+        public float VelocityI { get; set; }
+        public float VelocityD { get; set; }
+    }
     /// <summary>
     /// A control loop to maintain a target pressure.
     /// Since I want a gradual convergence, I'm doing control on desired target velocity:

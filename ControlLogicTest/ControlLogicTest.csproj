@@ -45,7 +45,9 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework">
+          <Private>False</Private>
+        </Reference>
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -58,6 +60,7 @@
     <Compile Include="PidTest.cs" />
     <Compile Include="PumpTest.cs" />
     <Compile Include="TestControlLoop.cs" />
+    <Compile Include="DerivativeTest.cs" />
     <Compile Include="ValueSrc.cs" />
   </ItemGroup>
   <ItemGroup>

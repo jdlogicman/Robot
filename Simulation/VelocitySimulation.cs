@@ -15,12 +15,20 @@ namespace Simulation
         public const float DEFAULT_MASS_KG = MASS_OF_DISPLACED_WATER_KG - 0.5f; // assume buoyant
 
             
-
+        /// <summary>
+        /// Calculate the velocity of the test module as a function of buoyancy and drag
+        /// </summary>
+        /// <param name="velocityNow">Current velocity, in m/s</param>
+        /// <param name="deltaTInMilliSeconds"></param>
+        /// <param name="mass">Total mass, in kg</param>
+        /// <param name="volume">Total volume in m^3</param>
+        /// <param name="areaFacingDirectionOfTravel">Area of the top, in m^2</param>
+        /// <returns>The new velocity in m/s</returns>
         public static float CalculateNewVelocity(float velocityNow, uint deltaTInMilliSeconds = 1000, 
             float mass = DEFAULT_MASS_KG, float volume = VOLUME_M3, 
             float areaFacingDirectionOfTravel = AREA_END_M2)
         {
-            const float DELTA_T_PER_ITERATION = 0.001f;
+            const float MILLIS_TO_SECONDS = 0.001f;
             
             float massOfDisplacedWater = volume * FLUID_DENSITY_KG_PER_M3;
             float gravityForce = (mass - massOfDisplacedWater) * GRAVITY;
@@ -31,7 +39,7 @@ namespace Simulation
                 float totalForce = gravityForce + dragForce;
                 float acceleration = totalForce / mass;
 
-                velocityNow += DELTA_T_PER_ITERATION * acceleration;
+                velocityNow += MILLIS_TO_SECONDS * acceleration;
             }
             return velocityNow;
         }
