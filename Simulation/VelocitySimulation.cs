@@ -12,7 +12,7 @@ namespace Simulation
         public const float LENGTH_M = 26 / 39.37f;
         public const float VOLUME_M3 = AREA_END_M2 * LENGTH_M;
         public const float MASS_OF_DISPLACED_WATER_KG = VOLUME_M3 * FLUID_DENSITY_KG_PER_M3;
-        public const float DEFAULT_MASS_KG = MASS_OF_DISPLACED_WATER_KG - 0.5f; // assume buoyant
+        public const float DEFAULT_MASS_KG = MASS_OF_DISPLACED_WATER_KG - 0.05f; // assume buoyant
 
             
         /// <summary>

@@ -3,6 +3,7 @@ using System.Linq;
 using ControlLogic;
 using Simulation;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Robot
 {
@@ -59,74 +60,47 @@ namespace Robot
                 }
             }
 #else
-            var controlArgs = new ControlParameters { PressureP = -0.3f, PressureD = -0.3f, VelocityP = -9.3f, VelocityD = -7.9f };
+            var controlArgs = new ControlParameters
+            {
+                PressureP = -0.3f, PressureD = -0.3f,
+                // VelocityP = -9.3f, VelocityD = -7.9f
+                VelocityP = -4f,
+                VelocityD = -4f
+            };
             RunSimulation(controlArgs, true);
 #endif
         }
 
         static int RunSimulation(ControlParameters p, bool printResults = false)
         {
-            float pressureNow = 0;
-            float velocityNowMetersPerSecond = 0;
-            float correction = 0;
-            BouyancySystem bs = new BouyancySystem();
+            var bs = new BouyancySystem();
+            var clock = new Clock(300);
+            var pressureSensor = new SimPressureSensor(clock, bs);
+            var loop = new PressureControlLoop(clock, bs, pressureSensor, p, TimeSpan.FromMilliseconds(3000));
+
             var values = new Dictionary<string, float>();
-            
-            var velocitySimulator = new LambdaHasValue(() =>
-                {
-                    var newVelocity = VelocitySimulation.CalculateNewVelocity(velocityNowMetersPerSecond,
-                        deltaTInMilliSeconds: DELTA_T_MS,
-                        mass: VelocitySimulation.DEFAULT_MASS_KG + bs.WaterMass);
-                    if (pressureNow == 0.0 && newVelocity < 0.0)
-                        newVelocity = 0;
-                    velocityNowMetersPerSecond = newVelocity;
-                    values["velocity"] = velocityNowMetersPerSecond;
-                    return newVelocity; 
-                });
-            
-            var pressureSimulator = new LambdaHasValue(() =>
-                {
-                    pressureNow = PressureSimulation.CalculatePressure(velocitySimulator.Get(), pressureNow, deltaTInMilliSeconds:DELTA_T_MS);
-                    values["pressure"] = pressureNow;
-                    return pressureNow;
-                });
-            
-            var pressureErrorCalculator = new ValueRecorder((v) => values["pe"] = v, 
-                new LambdaHasValue(() => pressureSimulator.Get() - TARGET_PRESSURE));
-            
-            var pressureController = new ValueRecorder((v) => values["pc"] = v, 
-                new Pid(pressureErrorCalculator, p.PressureP, p.PressureI, p.PressureD));
 
-            var velocityErrorCalculator = new ValueRecorder((v) => values["ve"] = v,
-                new Clamper(new LambdaHasValue(() =>
-                {
-                    var velocityBarPerSecond = velocityNowMetersPerSecond / METERS_PER_BAR;
-                    return velocityBarPerSecond - pressureController.Get();
-                    
-                }), -MAX_ABS_VELOCITY, MAX_ABS_VELOCITY));
-
-            var velocityController = new ValueRecorder((v) => values["vc"] = v, 
-                new Pid(velocityErrorCalculator, p.VelocityP, p.VelocityI, p.VelocityD));
-
-
+            loop.Enable(TARGET_PRESSURE);
+            
             int cycles = 0;
             int stableCycles = 0;
 
             
             while (cycles++ < 100 && stableCycles < 5 )
             {
-                correction = velocityController.Get();
-                bs.OnNext(correction);
                 values["bm"] = bs.WaterMass;
+                values["velocity"] = pressureSensor.Velocity;
+                var pressureNow = values["pressure"] = pressureSensor.Get();
+                values["control"] = loop.LastCorrection;
                 if (printResults)
                     Console.WriteLine(cycles.ToString() + " " + string.Join("\t", from kvp in values select string.Format("{0}:{1:F3}", kvp.Key, kvp.Value)));
                 
                     
-                bs.OnNext(correction);
                 if (Math.Abs(pressureNow - TARGET_PRESSURE) <= 0.05)
                     stableCycles++;
                 else
                     stableCycles = 0;
+                Thread.Sleep(1000);
             }
             if (printResults) Console.WriteLine("Total cycles: {0}", cycles);
             return cycles;

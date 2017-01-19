@@ -9,7 +9,7 @@ namespace ControlLogic
     /// Relies on the proved clock for notifications. The actual low-level control for the
     /// pump is injected as constructor params.
     /// </summary>
-    public class Pump 
+    public class Pump : IPump
     {
         IDigitalOutputPort _pumpOut;
         IDigitalOutputPort _pumpIn;

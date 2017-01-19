@@ -22,11 +22,12 @@ namespace ControlLogic
     /// </summary>
     public class PressureControlLoop
     {
-        readonly Pump _pump;
+        readonly IPump _pump;
         readonly IHasValue _pressureSensor;
         DateTime _lastControl;
         TimeSpan _controlInterval;
         float _currentPressureReading;
+        volatile float _lastCorrection;
 
         IHasValue _velocityController;
 
@@ -35,7 +36,7 @@ namespace ControlLogic
 
         private readonly ControlParameters _controlParameters;
 
-        public PressureControlLoop(IClock clock, Pump pump, IHasValue pressureSensor,
+        public PressureControlLoop(IClock clock, IPump pump, IHasValue pressureSensor,
             ControlParameters controlParams, TimeSpan controlInterval)
         {
             _pressureSensor = pressureSensor;
@@ -44,6 +45,8 @@ namespace ControlLogic
             _controlParameters = controlParams;
             clock.Register(Poll);
         }
+
+        public float LastCorrection => _lastCorrection;
 
         public void Enable(float targetPressure)
         {
@@ -81,11 +84,12 @@ namespace ControlLogic
                 if (interval >= _controlInterval)
                 {
                     _currentPressureReading = _pressureSensor.Get();
-                    var velocityCorrection = _velocityController.Get();
-                    if (velocityCorrection > 0)
-                        _pump.PumpIn(new TimeSpan((long)(System.Math.Abs(velocityCorrection) * PUMP_CORRECTION_SCALE_VALUE)));
-                    else if (velocityCorrection < 0)
-                        _pump.PumpOut(new TimeSpan((long)(velocityCorrection * PUMP_CORRECTION_SCALE_VALUE)));
+                    _lastCorrection = _velocityController.Get();
+                    
+                    if (_lastCorrection > 0)
+                        _pump.PumpIn(new TimeSpan((long)(System.Math.Abs(_lastCorrection) * PUMP_CORRECTION_SCALE_VALUE)));
+                    else if (_lastCorrection < 0)
+                        _pump.PumpOut(new TimeSpan((long)(_lastCorrection * PUMP_CORRECTION_SCALE_VALUE)));
         
                 }
             }
