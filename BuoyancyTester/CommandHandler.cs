@@ -1,6 +1,6 @@
 using System;
 using Microsoft.SPOT;
-using ControlLogicMF;
+using ControlLogic;
 
 namespace BuoyancyTester
 {
@@ -29,7 +29,14 @@ namespace BuoyancyTester
         {
             _pump = pump;
             _pressureSensor = new Averager(4, pressureSensor);
-            _controlLoop = new PressureControlLoop(clock, _pump, _pressureSensor, new TimeSpan(0, 0, 3));
+            var controlArgs = new ControlParameters
+            {
+                PressureP = -0.3f,
+                PressureD = -0.3f,
+                VelocityP = -4f,
+                VelocityD = -4f
+            };
+            _controlLoop = new PressureControlLoop(clock, _pump, _pressureSensor, controlArgs, new TimeSpan(0, 0, 3));
         }
 
         public void OnButtonPress(Command cmd)

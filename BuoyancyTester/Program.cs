@@ -3,7 +3,7 @@ using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
 using SecretLabs.NETMF.Hardware;
 using SecretLabs.NETMF.Hardware.NetduinoMini;
-using ControlLogicMF;
+using ControlLogic;
 
 namespace BuoyancyTester
 {

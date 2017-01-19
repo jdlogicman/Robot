@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ControlLogic
 {
@@ -24,7 +20,7 @@ namespace ControlLogic
             var now = DateTime.Now;
             if (_lastSample != DateTime.MinValue && _lastSample != now)
             {
-                result = (newValue - _lastValue) / (float)(now - _lastSample).TotalSeconds;
+                result = (newValue - _lastValue) / (float)(now - _lastSample).TotalSeconds();
             }
             _lastSample = now;
             _lastValue = newValue;

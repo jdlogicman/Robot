@@ -1,10 +1,11 @@
 ﻿using System;
+using static ControlLogic.Types;
 
 namespace ControlLogic
 {
     public class LambdaHasValue : IHasValue
     {
-        public LambdaHasValue(Func<float> processor)
+        public LambdaHasValue(FloatFunc processor)
         {
             _processor = processor;
         }
@@ -14,7 +15,7 @@ namespace ControlLogic
             return _processor();
         }
 
-        private Func<float> _processor;
+        private FloatFunc _processor;
 
     }
 }

@@ -6,6 +6,6 @@ namespace ControlLogic
     {
         public delegate void Action();
         public delegate void ActionUint(uint arg);
-
+        public delegate float FloatFunc();
     }
 }

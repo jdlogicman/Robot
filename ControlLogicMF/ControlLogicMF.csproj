@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyName>ControlLogicMF</AssemblyName>
     <OutputType>Library</OutputType>
-    <RootNamespace>ControlLogicMF</RootNamespace>
+    <RootNamespace>ControlLogic</RootNamespace>
     <ProjectTypeGuids>{b69e3092-b931-443c-abe7-7e7b65f2a37f};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
@@ -35,11 +35,15 @@
     <Compile Include="Averager.cs" />
     <Compile Include="ButtonPressCounter.cs" />
     <Compile Include="Clamper.cs" />
+    <Compile Include="DerivativeCalculator.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="IDigitalPort.cs" />
     <Compile Include="ErrorCalculator.cs" />
     <Compile Include="IClock.cs" />
     <Compile Include="IHasValue.cs" />
     <Compile Include="ILog.cs" />
+    <Compile Include="IPump.cs" />
+    <Compile Include="LambdaHasValue.cs" />
     <Compile Include="Pid.cs" />
     <Compile Include="PressureControlLoop.cs" />
     <Compile Include="PressureSensor.cs" />

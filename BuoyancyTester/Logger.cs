@@ -1,6 +1,6 @@
 using System;
 using Microsoft.SPOT;
-using ControlLogicMF;
+using ControlLogic;
 
 namespace BuoyancyTester
 {
