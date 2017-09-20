@@ -16,6 +16,7 @@ namespace ControlLogic
         ILogger _log;
         DateTime _lastOperationStarted = DateTime.MinValue;
         TimeSpan _duration;
+        IClock _clock;
 
         public Pump(IClock clock, ILogger log, IDigitalOutputPort output, IDigitalOutputPort input)
         {
@@ -24,8 +25,8 @@ namespace ControlLogic
             _log = log;
             _pumpIn.Set(false);
             _pumpOut.Set(false);
-            
-            clock.Register(Poll);
+            _clock = clock;
+            _clock.Register(Poll);
         }
 
         public void PumpOut(TimeSpan duration)
@@ -43,7 +44,7 @@ namespace ControlLogic
         {
             Stop();
             _duration = duration;
-            _lastOperationStarted = DateTime.Now;
+            _lastOperationStarted = _clock.Now;
             port.Set(true);
         }
 
@@ -51,7 +52,7 @@ namespace ControlLogic
         {
             if (_lastOperationStarted != DateTime.MinValue)
             {
-                var currentDuration = DateTime.Now - _lastOperationStarted;
+                var currentDuration = _clock.Now - _lastOperationStarted;
                 if (currentDuration >= _duration)
                 {
                     Stop();

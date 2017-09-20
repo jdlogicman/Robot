@@ -12,7 +12,7 @@ namespace ControlLogicTest
         public void Test()
         {
             uint count = 0;
-            using (var clock = new Clock(50))
+            using (var clock = new ClockMock(50))
             {
                 ButtonPressCounter counter = new ButtonPressCounter(clock, 50);
 
@@ -22,12 +22,12 @@ namespace ControlLogicTest
                 counter.RecordPress();
                 counter.RecordPress();
                 counter.RecordPress();
-                Thread.Sleep(200);
+                clock.Elapse(200);
                 Assert.AreEqual<uint>(3, count);
                 count = 0;
                 counter.RecordPress();
                 Assert.AreEqual<uint>(0, count);
-                Thread.Sleep(200);
+                clock.Elapse(200);
                 Assert.AreEqual<uint>(1, count);
             }
         }

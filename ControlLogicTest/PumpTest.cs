@@ -13,14 +13,14 @@ namespace ControlLogicTest
 		MockDigitalPort _in;
 		MockDigitalPort _out;
 		Pump _pump;
-		Clock _clock;
+		ClockMock _clock;
 		
 		[TestInitialize]
 		public void Init()
 		{
-			_clock = new Clock(50);
-			_in = new MockDigitalPort();
-			_out = new MockDigitalPort();
+			_clock = new ClockMock(50);
+			_in = new MockDigitalPort(_clock);
+			_out = new MockDigitalPort(_clock);
 			_pump = new Pump(_clock, new MockLog(), _out, _in);
 				
 		}
@@ -36,7 +36,7 @@ namespace ControlLogicTest
 			_pump.PumpIn(TimeSpan.FromMilliseconds(150));
 			Assert.IsTrue(_in.State);
 			Assert.IsFalse(_out.State);
-			Thread.Sleep(250);
+			_clock.Elapse(250);
 			Assert.IsFalse(_in.State);
 			Assert.IsFalse(_out.State);
 			Assert.IsTrue(Math.Abs(_in.Duration.TotalMilliseconds - 150) < 50);
@@ -47,7 +47,7 @@ namespace ControlLogicTest
             _pump.PumpOut(TimeSpan.FromMilliseconds(150));
             Assert.IsFalse(_in.State);
             Assert.IsTrue(_out.State);
-            Thread.Sleep(250);
+            _clock.Elapse(250);
             Assert.IsFalse(_in.State);
             Assert.IsFalse(_out.State);
             Assert.IsTrue(Math.Abs(_out.Duration.TotalMilliseconds - 150) < 50);

@@ -14,5 +14,6 @@ namespace ControlLogic
         void Register(Types.Action callback);
         void Start();
         void Stop();
+        DateTime Now { get; }
     }
 }

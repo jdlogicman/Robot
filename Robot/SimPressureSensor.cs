@@ -14,19 +14,21 @@ namespace Robot
         volatile float _pressure;
         volatile float _velocity;
         DateTime _lastPoll;
+        IClock _clock;
         readonly uint UPDATE_INTERVAL_MS = 300;
         public SimPressureSensor(IClock clock, BouyancySystem bs, float startingPressure=0, float currentVelocity = 0)
         {
             _bs = bs;
             _pressure = startingPressure;
             _velocity = currentVelocity;
-            _lastPoll = DateTime.Now;
+            _clock = clock;
+            _lastPoll = _clock.Now;
             clock.Register(Poll);
         }
 
         void Poll()
         {
-            var now = DateTime.Now;
+            var now = _clock.Now;
             var elapsed = (now - _lastPoll);
             var millis = (uint)elapsed.TotalMilliseconds;
             if (millis >= UPDATE_INTERVAL_MS)

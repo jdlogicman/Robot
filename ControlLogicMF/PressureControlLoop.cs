@@ -24,6 +24,7 @@ namespace ControlLogic
     {
         readonly IPump _pump;
         readonly IHasValue _pressureSensor;
+        readonly IClock _clock;
         DateTime _lastControl;
         TimeSpan _controlInterval;
         float _currentPressureReading;
@@ -43,7 +44,8 @@ namespace ControlLogic
             _pump = pump;
             _controlInterval = controlInterval;
             _controlParameters = controlParams;
-            clock.Register(Poll);
+            _clock = clock;
+            _clock.Register(Poll);
         }
 
         public float LastCorrection => _lastCorrection;
@@ -56,7 +58,7 @@ namespace ControlLogic
             var pressureController = new Pid(pressureErrorCalculator,
                 _controlParameters.PressureP, _controlParameters.PressureI, _controlParameters.PressureD);
 
-            var velocity = new DerivativeCalculator(new LambdaHasValue(() => _currentPressureReading));
+            var velocity = new DerivativeCalculator(_clock, new LambdaHasValue(() => _currentPressureReading));
 
             var velocityErrorCalculator = new Clamper(new LambdaHasValue(() =>
                 {
@@ -67,7 +69,7 @@ namespace ControlLogic
             _velocityController = new Pid(velocityErrorCalculator, 
                 _controlParameters.VelocityP, _controlParameters.VelocityI, _controlParameters.VelocityD);
 
-            _lastControl = DateTime.Now;
+            _lastControl = _clock.Now;
         }
         public void Disable()
         {
@@ -80,7 +82,7 @@ namespace ControlLogic
         {
             if (_lastControl != DateTime.MinValue)
             {
-                var interval = DateTime.Now - _lastControl;
+                var interval = _clock.Now - _lastControl;
                 if (interval >= _controlInterval)
                 {
                     _currentPressureReading = _pressureSensor.Get();

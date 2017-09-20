@@ -27,6 +27,8 @@ namespace ControlLogic
             _timer = new System.Threading.Timer(Callback, null, _interval, -1);
         }
 
+        public DateTime Now {  get { return DateTime.Now;  } }
+
         private void Callback(object state)
         {
             var listeners = _listeners;
